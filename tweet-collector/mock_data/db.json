@@ -1,0 +1,245 @@
+{
+  "tweets": [
+    {
+      "id": "1000",
+      "text": "New trending topic on #kubernetes #blockchain - what do you think?",
+      "user": {
+        "id": 2342,
+        "screen_name": "user_1350",
+        "followers_count": 9374
+      },
+      "created_at": "2025-03-30T22:55:26.598923",
+      "location": {
+        "lat": 51.55417483338781,
+        "lon": -0.055811156208852464
+      },
+      "hashtags": [
+        "kubernetes",
+        "blockchain"
+      ],
+      "retweet_count": 75,
+      "favorite_count": 199
+    },
+    {
+      "id": "1001",
+      "text": "New trending topic on #fullstack #frontend #bigdata - what do you think?",
+      "user": {
+        "id": 2390,
+        "screen_name": "user_6157",
+        "followers_count": 6499
+      },
+      "created_at": "2025-03-30T22:55:26.607631",
+      "location": {
+        "lat": 40.68224497617452,
+        "lon": -73.96593854905782
+      },
+      "hashtags": [
+        "fullstack",
+        "frontend",
+        "bigdata"
+      ],
+      "retweet_count": 56,
+      "favorite_count": 191
+    },
+    {
+      "id": "1002",
+      "text": "New trending topic on #blockchain #IoT - what do you think?",
+      "user": {
+        "id": 9193,
+        "screen_name": "user_2379",
+        "followers_count": 314
+      },
+      "created_at": "2025-03-31T00:23:43.417643",
+      "location": {
+        "lat": 55.702860919947426,
+        "lon": 37.708368779467065
+      },
+      "hashtags": [
+        "blockchain",
+        "IoT"
+      ],
+      "retweet_count": 44,
+      "favorite_count": 149
+    },
+    {
+      "id": "1003",
+      "text": "New trending topic on #fullstack #machinelearning #frontend - what do you think?",
+      "user": {
+        "id": 7641,
+        "screen_name": "user_5058",
+        "followers_count": 6719
+      },
+      "created_at": "2025-03-31T00:23:43.439454",
+      "location": {
+        "lat": 40.805663988511206,
+        "lon": -74.09212174219427
+      },
+      "hashtags": [
+        "fullstack",
+        "machinelearning",
+        "frontend"
+      ],
+      "retweet_count": 65,
+      "favorite_count": 16
+    },
+    {
+      "id": "1004",
+      "text": "New trending topic on #frontend #programming #kubernetes - what do you think?",
+      "user": {
+        "id": 3937,
+        "screen_name": "user_3201",
+        "followers_count": 9586
+      },
+      "created_at": "2025-03-31T00:23:43.447952",
+      "location": {
+        "lat": -33.78898786877926,
+        "lon": 151.30043006599482
+      },
+      "hashtags": [
+        "frontend",
+        "programming",
+        "kubernetes"
+      ],
+      "retweet_count": 97,
+      "favorite_count": 101
+    },
+    {
+      "id": "1005",
+      "text": "New trending topic on #frontend #analytics - what do you think?",
+      "user": {
+        "id": 4395,
+        "screen_name": "user_5577",
+        "followers_count": 5365
+      },
+      "created_at": "2025-03-31T00:38:31.706944",
+      "location": {
+        "lat": -33.964152677134074,
+        "lon": 151.20420544481786
+      },
+      "hashtags": [
+        "frontend",
+        "analytics"
+      ],
+      "retweet_count": 73,
+      "favorite_count": 92
+    },
+    {
+      "id": "1006",
+      "text": "New trending topic on #serverless #data - what do you think?",
+      "user": {
+        "id": 8864,
+        "screen_name": "user_7083",
+        "followers_count": 2993
+      },
+      "created_at": "2025-03-31T00:38:31.802143",
+      "location": {
+        "lat": 35.6189777452957,
+        "lon": 139.7377698503885
+      },
+      "hashtags": [
+        "serverless",
+        "data"
+      ],
+      "retweet_count": 32,
+      "favorite_count": 130
+    },
+    {
+      "id": "1007",
+      "text": "New trending topic on #python #blockchain #tech - what do you think?",
+      "user": {
+        "id": 5128,
+        "screen_name": "user_1959",
+        "followers_count": 9405
+      },
+      "created_at": "2025-03-31T00:38:31.819473",
+      "location": {
+        "lat": 35.697255614095845,
+        "lon": 139.57623796088743
+      },
+      "hashtags": [
+        "python",
+        "blockchain",
+        "tech"
+      ],
+      "retweet_count": 45,
+      "favorite_count": 125
+    },
+    {
+      "id": 1008,
+      "text": "New trending topic on #blockchain - what do you think?",
+      "user": {
+        "id": 9287,
+        "screen_name": "user_2787",
+        "followers_count": 664
+      },
+      "created_at": "2025-03-31T01:05:28.242457",
+      "location": {
+        "lat": 55.80493211188224,
+        "lon": 37.64720480306402
+      },
+      "hashtags": [
+        "blockchain"
+      ],
+      "retweet_count": 60,
+      "favorite_count": 120
+    },
+    {
+      "id": 1009,
+      "text": "New trending topic on #kubernetes #blockchain - what do you think?",
+      "user": {
+        "id": 8865,
+        "screen_name": "user_6127",
+        "followers_count": 304
+      },
+      "created_at": "2025-03-31T01:05:28.321605",
+      "location": {
+        "lat": 19.004309078163093,
+        "lon": 72.87072493610106
+      },
+      "hashtags": [
+        "kubernetes",
+        "blockchain"
+      ],
+      "retweet_count": 63,
+      "favorite_count": 150
+    },
+    {
+      "id": 1010,
+      "text": "New trending topic on #kubernetes - what do you think?",
+      "user": {
+        "id": 4005,
+        "screen_name": "user_9625",
+        "followers_count": 5921
+      },
+      "created_at": "2025-03-31T01:05:28.328092",
+      "location": {
+        "lat": 55.793602962911045,
+        "lon": 37.65892087644784
+      },
+      "hashtags": [
+        "kubernetes"
+      ],
+      "retweet_count": 44,
+      "favorite_count": 27
+    },
+    {
+      "id": 1011,
+      "text": "New trending topic on #data - what do you think?",
+      "user": {
+        "id": 6358,
+        "screen_name": "user_7612",
+        "followers_count": 4427
+      },
+      "created_at": "2025-03-31T01:10:50.800482",
+      "location": {
+        "lat": 40.71234057979933,
+        "lon": -73.96939723630915
+      },
+      "hashtags": [
+        "data"
+      ],
+      "retweet_count": 86,
+      "favorite_count": 164
+    }
+  ]
+}
