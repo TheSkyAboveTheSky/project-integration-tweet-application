@@ -1,0 +1,6 @@
+kafka-python==2.0.2
+elasticsearch==7.17.0
+nltk==3.8.1
+requests==2.31.0
+python-dotenv==0.21.1
+six>=1.16.0
