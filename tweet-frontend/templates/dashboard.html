@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Tweet Analytics{% endblock %}
+
+{% block content %}
+<h2>Tweet Analytics Dashboard</h2>
+
+<div id="loading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div id="dashboard-content" style="display: none;">
+    <div class="row">
+        <!-- Sentiment Chart -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Trending Hashtags Chart -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="hashtagChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Region Chart -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="regionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Trending Hashtags Table -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    Trending Hashtags
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Hashtag</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hashtags-table">
+                            <!-- Hashtags will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Regional Distribution Table -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    Geographic Distribution
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Region</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="regions-table">
+                            <!-- Regions will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let sentimentChart, hashtagChart, regionChart;
+    let sentimentData, trendsData, regionsData;
+    let totalTweets = 0;
+    
+    // Function to create sentiment chart
+    function createSentimentChart() {
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        sentimentChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Positive', 'Negative', 'Neutral'],
+                datasets: [{
+                    data: [
+                        sentimentData.positive,
+                        sentimentData.negative,
+                        sentimentData.neutral
+                    ],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(201, 203, 207, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Tweet Sentiment Distribution'
+                    }
+                }
+            }
+        });
+    }
+
+    // Function to create hashtag chart
+    function createHashtagChart() {
+        const ctx = document.getElementById('hashtagChart').getContext('2d');
+        hashtagChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: trendsData.hashtags.slice(0, 5).map(tag => '#' + tag.tag),
+                datasets: [{
+                    label: 'Mentions',
+                    data: trendsData.hashtags.slice(0, 5).map(tag => tag.count),
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Top 5 Hashtags'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Function to create region chart
+    function createRegionChart() {
+        const ctx = document.getElementById('regionChart').getContext('2d');
+        regionChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: regionsData.regions.map(region => region.region),
+                datasets: [{
+                    data: regionsData.regions.map(region => region.count),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Tweet Geographic Distribution'
+                    }
+                }
+            }
+        });
+    }
+
+    // Function to populate hashtags table
+    function populateHashtagsTable() {
+        const tbody = document.getElementById('hashtags-table');
+        tbody.innerHTML = '';
+        
+        trendsData.hashtags.forEach(tag => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>#${tag.tag}</td>
+                <td>${tag.count}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Function to populate regions table
+    function populateRegionsTable() {
+        const tbody = document.getElementById('regions-table');
+        tbody.innerHTML = '';
+        
+        regionsData.regions.forEach(region => {
+            const percentage = (region.count / totalTweets * 100).toFixed(1);
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${region.region}</td>
+                <td>${region.count}</td>
+                <td>${percentage}%</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Function to load all data
+    async function loadData() {
+        try {
+            // Get sentiment data
+            const sentimentResponse = await fetch('/api/sentiment');
+            sentimentData = await sentimentResponse.json();
+            totalTweets = sentimentData.total_analyzed;
+            
+            // Get trending hashtags
+            const trendsResponse = await fetch('/api/trends');
+            trendsData = await trendsResponse.json();
+            
+            // Get region data
+            const regionsResponse = await fetch('/api/regions');
+            regionsData = await regionsResponse.json();
+            
+            // Hide loading spinner and show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'block';
+            
+            // Create charts and tables
+            createSentimentChart();
+            createHashtagChart();
+            createRegionChart();
+            populateHashtagsTable();
+            populateRegionsTable();
+        } catch (error) {
+            console.error('Error loading data:', error);
+            document.getElementById('loading').innerHTML = `
+                <div class="alert alert-danger">
+                    Error loading data: ${error.message}
+                </div>
+            `;
+        }
+    }
+
+    // Load data when page loads
+    loadData();
+});
+</script>
+{% endblock %}
