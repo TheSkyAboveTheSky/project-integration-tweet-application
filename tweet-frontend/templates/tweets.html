@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Tweets - Tweet Analytics{% endblock %}
+
+{% block content %}
+<h2>Recent Tweets</h2>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search tweets...">
+            <button class="btn btn-primary" id="searchBtn">Search</button>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="d-flex">
+            <select class="form-control me-2" id="hashtagFilter">
+                <option value="">All Hashtags</option>
+                <option value="AI">AI</option>
+                <option value="tech">Tech</option>
+                <option value="data">Data</option>
+                <option value="cloud">Cloud</option>
+                <option value="blockchain">Blockchain</option>
+                <option value="kubernetes">Kubernetes</option>
+                <option value="fullstack">Fullstack</option>
+            </select>
+            
+            <select class="form-control me-2" id="sentimentFilter">
+                <option value="">All Sentiments</option>
+                <option value="positive">Positive</option>
+                <option value="negative">Negative</option>
+                <option value="neutral">Neutral</option>
+            </select>
+            
+            <button class="btn btn-outline-secondary" id="resetBtn">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="text-center">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div id="noResults" class="alert alert-info" style="display: none;">
+    No tweets found matching your criteria.
+</div>
+
+<div id="tweetList"></div>
+
+<div class="d-flex justify-content-center mt-4">
+    <button id="loadMoreBtn" class="btn btn-primary" style="display: none;">Load More</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const hashtagFilter = document.getElementById('hashtagFilter');
+    const sentimentFilter = document.getElementById('sentimentFilter');
+    const resetBtn = document.getElementById('resetBtn');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const tweetList = document.getElementById('tweetList');
+    const loading = document.getElementById('loading');
+    const noResults = document.getElementById('noResults');
+    
+    let currentOffset = 0;
+    const limit = 10;
+    let totalTweets = 0;
+    let currentParams = {};
+    
+    // Function to load tweets
+    async function loadTweets(offset = 0, append = false) {
+        try {
+            loading.style.display = 'block';
+            noResults.style.display = 'none';
+            if (!append) {
+                tweetList.innerHTML = '';
+                loadMoreBtn.style.display = 'none';
+            }
+            
+            // Build query parameters
+            const params = new URLSearchParams({
+                limit: limit,
+                offset: offset
+            });
+            
+            if (searchInput.value) {
+                params.append('q', searchInput.value);
+                currentParams.q = searchInput.value;
+            }
+            
+            if (hashtagFilter.value) {
+                params.append('hashtag', hashtagFilter.value);
+                currentParams.hashtag = hashtagFilter.value;
+            }
+            
+            if (sentimentFilter.value) {
+                params.append('sentiment', sentimentFilter.value);
+                currentParams.sentiment = sentimentFilter.value;
+            }
+            
+            // Fetch tweets from API
+            const response = await fetch(`/api/tweets?${params.toString()}`);
+            const data = await response.json();
+            
+            loading.style.display = 'none';
+            
+            // If no tweets found
+            if (data.tweets.length === 0 && !append) {
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            // Update total count
+            totalTweets = data.total;
+            
+            // Render tweets
+            data.tweets.forEach(tweet => {
+                const tweetCard = document.createElement('div');
+                tweetCard.className = 'card mb-3';
+                
+                // Create sentiment badge class
+                let badgeClass = 'bg-secondary';
+                if (tweet.sentiment && tweet.sentiment.label) {
+                    if (tweet.sentiment.label === 'positive') {
+                        badgeClass = 'bg-success';
+                    } else if (tweet.sentiment.label === 'negative') {
+                        badgeClass = 'bg-danger';
+                    }
+                }
+                
+                // Format date
+                const createdAt = new Date(tweet.created_at).toLocaleString();
+                
+                // Create hashtag badges
+                const hashtagsHtml = tweet.hashtags.map(tag => 
+                    `<span class="badge bg-primary me-1">#${tag}</span>`
+                ).join('');
+                
+                tweetCard.innerHTML = `
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="card-title">@${tweet.user.screen_name}</h5>
+                            <span class="badge ${badgeClass}">${tweet.sentiment ? tweet.sentiment.label : 'unknown'}</span>
+                        </div>
+                        <p class="card-text">${tweet.text}</p>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                ${hashtagsHtml}
+                            </div>
+                            <small class="text-muted">${createdAt}</small>
+                        </div>
+                    </div>
+                `;
+                
+                tweetList.appendChild(tweetCard);
+            });
+            
+            // Show "Load More" button if there are more tweets
+            if (offset + data.tweets.length < totalTweets) {
+                loadMoreBtn.style.display = 'block';
+                currentOffset = offset + data.tweets.length;
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+            
+        } catch (error) {
+            console.error('Error loading tweets:', error);
+            loading.style.display = 'none';
+            tweetList.innerHTML = `
+                <div class="alert alert-danger">
+                    Error loading tweets: ${error.message}
+                </div>
+            `;
+        }
+    }
+    
+    // Event listeners
+    searchBtn.addEventListener('click', () => {
+        currentOffset = 0;
+        loadTweets(0, false);
+    });
+    
+    searchInput.addEventListener('keyup', event => {
+        if (event.key === 'Enter') {
+            currentOffset = 0;
+            loadTweets(0, false);
+        }
+    });
+    
+    hashtagFilter.addEventListener('change', () => {
+        currentOffset = 0;
+        loadTweets(0, false);
+    });
+    
+    sentimentFilter.addEventListener('change', () => {
+        currentOffset = 0;
+        loadTweets(0, false);
+    });
+    
+    resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        hashtagFilter.value = '';
+        sentimentFilter.value = '';
+        currentOffset = 0;
+        currentParams = {};
+        loadTweets(0, false);
+    });
+    
+    loadMoreBtn.addEventListener('click', () => {
+        loadTweets(currentOffset, true);
+    });
+    
+    // Initial load
+    loadTweets(0, false);
+});
+</script>
+{% endblock %}
