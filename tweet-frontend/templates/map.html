@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Tweet Map - Tweet Analytics{% endblock %}
+
+{% block head %}
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+    }
+    .map-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>Tweet Map</h2>
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <div class="d-flex">
+            <select class="form-control me-2" id="hashtagFilter">
+                <option value="">All Hashtags</option>
+                <option value="AI">AI</option>
+                <option value="tech">Tech</option>
+                <option value="data">Data</option>
+                <option value="cloud">Cloud</option>
+                <option value="blockchain">Blockchain</option>
+                <option value="kubernetes">Kubernetes</option>
+                <option value="fullstack">Fullstack</option>
+            </select>
+            
+            <select class="form-control me-2" id="sentimentFilter">
+                <option value="">All Sentiments</option>
+                <option value="positive">Positive</option>
+                <option value="negative">Negative</option>
+                <option value="neutral">Neutral</option>
+            </select>
+            
+            <button class="btn btn-primary me-2" id="applyBtn">Apply</button>
+            <button class="btn btn-outline-secondary" id="resetBtn">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="position-relative">
+    <div id="loading" class="map-loading">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div id="map"></div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Map Legend</h5>
+                <div class="d-flex">
+                    <div class="me-4">
+                        <span class="badge bg-success">&nbsp;&nbsp;&nbsp;</span> Positive Sentiment
+                    </div>
+                    <div class="me-4">
+                        <span class="badge bg-danger">&nbsp;&nbsp;&nbsp;</span> Negative Sentiment
+                    </div>
+                    <div>
+                        <span class="badge bg-secondary">&nbsp;&nbsp;&nbsp;</span> Neutral Sentiment
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hashtagFilter = document.getElementById('hashtagFilter');
+    const sentimentFilter = document.getElementById('sentimentFilter');
+    const applyBtn = document.getElementById('applyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const loading = document.getElementById('loading');
+    
+    let map;
+    let markers = [];
+    
+    // Initialize map
+    function initMap() {
+        map = L.map('map').setView([20, 0], 2);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    }
+    
+    // Function to clear all markers
+    function clearMarkers() {
+        markers.forEach(marker => {
+            map.removeLayer(marker);
+        });
+        markers = [];
+    }
+    
+    // Function to get marker color based on sentiment
+    function getMarkerColor(sentiment) {
+        switch (sentiment) {
+            case 'positive': return 'green';
+            case 'negative': return 'red';
+            default: return 'gray';
+        }
+    }
+    
+    // Function to load map data
+    async function loadMapData() {
+        try {
+            loading.style.display = 'block';
+            
+            // Clear existing markers
+            clearMarkers();
+            
+            // Build query parameters
+            const params = new URLSearchParams();
+            
+            if (hashtagFilter.value) {
+                params.append('hashtag', hashtagFilter.value);
+            }
+            
+            if (sentimentFilter.value) {
+                params.append('sentiment', sentimentFilter.value);
+            }
+            
+            // Fetch map data from API
+            const response = await fetch(`/api/map-data?${params.toString()}`);
+            const data = await response.json();
+            
+            loading.style.display = 'none';
+            
+            // Add markers for each tweet with geo data
+            data.points.forEach(point => {
+                if (point.geo && point.geo.lat && point.geo.lon) {
+                    // Create marker
+                    const marker = L.circleMarker([point.geo.lat, point.geo.lon], {
+                        radius: 8,
+                        fillColor: getMarkerColor(point.sentiment),
+                        color: '#000',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map);
+                    
+                    // Create hashtag HTML
+                    const hashtagsHtml = point.hashtags.map(tag => 
+                        `<span class="badge bg-primary me-1">#${tag}</span>`
+                    ).join(' ');
+                    
+                    // Add popup
+                    marker.bindPopup(`
+                        <strong>Tweet:</strong> ${point.text}<br>
+                        <strong>Sentiment:</strong> ${point.sentiment}<br>
+                        <strong>Hashtags:</strong> ${hashtagsHtml}
+                    `);
+                    
+                    markers.push(marker);
+                }
+            });
+            
+        } catch (error) {
+            console.error('Error loading map data:', error);
+            loading.style.display = 'none';
+        }
+    }
+    
+    // Event listeners
+    applyBtn.addEventListener('click', loadMapData);
+    
+    resetBtn.addEventListener('click', () => {
+        hashtagFilter.value = '';
+        sentimentFilter.value = '';
+        loadMapData();
+    });
+    
+    // Initialize map and load data
+    initMap();
+    loadMapData();
+});
+</script>
+{% endblock %}
