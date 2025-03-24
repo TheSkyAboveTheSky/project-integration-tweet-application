@@ -1,0 +1,70 @@
+/* Main styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar styling */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Card styling */
+.card {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+    font-weight: 600;
+}
+
+/* Badge styling */
+.badge {
+    font-weight: 500;
+    padding: 5px 10px;
+}
+
+/* Chart container */
+canvas {
+    max-width: 100%;
+}
+
+/* Table styling */
+.table th {
+    font-weight: 600;
+}
+
+/* Loading spinner */
+.spinner-border {
+    color: #007bff;
+}
+
+/* Custom colors for sentiment */
+.sentiment-positive {
+    color: #28a745;
+}
+
+.sentiment-negative {
+    color: #dc3545;
+}
+
+.sentiment-neutral {
+    color: #6c757d;
+}
+
+/* Footer styling */
+footer {
+    margin-top: 50px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .container {
+        padding: 0 15px;
+    }
+}
