@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: json-server
+  namespace: tweet-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: json-server
+  template:
+    metadata:
+      labels:
+        app: json-server
+    spec:
+      containers:
+      - name: json-server
+        image: vimagick/json-server:latest
+        args:
+        - --host
+        - 0.0.0.0
+        - --port
+        - "80"
+        - /data/db.json
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      volumes:
+      - name: data
+        configMap:
+          name: json-server-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: json-server
+  namespace: tweet-analytics
+spec:
+  selector:
+    app: json-server
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: json-server-data
+  namespace: tweet-analytics
+data:
+  db.json: |
+    {
+      "tweets": [
+        {
+          "id": 1000,
+          "text": "New trending topic on #kubernetes #blockchain - what do you think?",
+          "user": {
+            "id": 2342,
+            "screen_name": "user_1350",
+            "followers_count": 9374
+          },
+          "created_at": "2025-03-30T22:55:26.598923",
+          "location": {
+            "lat": 51.55417483338781,
+            "lon": -0.055811156208852464
+          },
+          "hashtags": [
+            "kubernetes",
+            "blockchain"
+          ],
+          "retweet_count": 75,
+          "favorite_count": 199
+        },
+        {
+          "id": 1001,
+          "text": "New trending topic on #fullstack #frontend #bigdata - what do you think?",
+          "user": {
+            "id": 2390,
+            "screen_name": "user_6157",
+            "followers_count": 6499
+          },
+          "created_at": "2025-03-30T22:55:26.607631",
+          "location": {
+            "lat": 40.68224497617452,
+            "lon": -73.96593854905782
+          },
+          "hashtags": [
+            "fullstack",
+            "frontend",
+            "bigdata"
+          ],
+          "retweet_count": 56,
+          "favorite_count": 191
+        }
+      ]
+    }
