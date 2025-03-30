@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tweet-collector
+  namespace: tweet-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tweet-collector
+  template:
+    metadata:
+      labels:
+        app: tweet-collector
+    spec:
+      containers:
+      - name: tweet-collector
+        image: tweet-collector:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        # Configuration pour Kafka
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka:9092
+        # URL de la base de données JSON Server
+        - name: DB_URL
+          value: http://json-server/tweets
+        volumeMounts:
+        - name: config
+          mountPath: /app/config.ini
+          subPath: config.ini
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+      volumes:
+      - name: config
+        configMap:
+          name: tweet-collector-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tweet-collector-config
+  namespace: tweet-analytics
+data:
+  config.ini: |
+    [database]
+    type = json-server
+    url = http://json-server/tweets
+    polling_endpoint = /tweets
+
+    [kafka]
+    bootstrap_servers = kafka:9092
+    topic = raw-tweets
+
+    [collector]
+    polling_interval = 5
+    batch_size = 100
