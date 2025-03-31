@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tweet-api
+  namespace: tweet-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tweet-api
+  template:
+    metadata:
+      labels:
+        app: tweet-api
+    spec:
+      containers:
+      - name: tweet-api
+        image: tweet-api:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ES_HOST
+          value: elasticsearch:9200
+        - name: ES_INDEX
+          value: tweets
+        - name: API_HOST
+          value: 0.0.0.0
+        - name: API_PORT
+          value: "8000"
+        ports:
+        - containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tweet-api
+  namespace: tweet-analytics
+spec:
+  selector:
+    app: tweet-api
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tweet-api-ingress
+  namespace: tweet-analytics
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: api.tweet-analytics.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tweet-api
+            port:
+              number: 8000
