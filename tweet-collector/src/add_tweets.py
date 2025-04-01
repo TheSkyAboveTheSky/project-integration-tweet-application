@@ -32,17 +32,52 @@ HASHTAGS = [
     "kubernetes", "devops", "frontend", "backend", "fullstack"
 ]
 
+# Add sentiment-specific phrases for tweet generation
+POSITIVE_PHRASES = [
+    "I love this new", "Great progress on", "Excited about", 
+    "Amazing results with", "Happy to see", "Impressive work on",
+    "Excellent implementation of", "Looking forward to more", 
+    "Really enjoying", "Fantastic developments in"
+]
+
+NEGATIVE_PHRASES = [
+    "Disappointed with", "Frustrated by", "Not impressed with",
+    "Having issues with", "Problems using", "Hate how", 
+    "Terrible experience with", "Avoid using", "Failed attempt at",
+    "Struggling with"
+]
+
+NEUTRAL_PHRASES = [
+    "New trending topic on", "Just read about", "Anyone using",
+    "Thoughts on", "Recently tried", "Exploring",
+    "Learning about", "Working with", "Research on",
+    "Updates on"
+]
+
 def generate_tweet(tweet_id):
-    """Generate a random tweet with specified ID."""
+    """Generate a random tweet with specified ID and varied sentiment."""
     lat, lon = random.choice(LOCATIONS)
     lat += random.uniform(-0.1, 0.1)  # Add some randomness
     lon += random.uniform(-0.1, 0.1)
     
     tweet_hashtags = random.sample(HASHTAGS, random.randint(1, 3))
     
+    # Choose sentiment randomly with equal probability
+    sentiment_type = random.choice(["positive", "negative", "neutral"])
+    
+    if sentiment_type == "positive":
+        phrase = random.choice(POSITIVE_PHRASES)
+    elif sentiment_type == "negative":
+        phrase = random.choice(NEGATIVE_PHRASES)
+    else:
+        phrase = random.choice(NEUTRAL_PHRASES)
+    
+    # Create tweet text with the chosen sentiment phrase
+    text = f"{phrase} #{' #'.join(tweet_hashtags)} - what do you think?"
+    
     return {
         "id": tweet_id,
-        "text": f"New trending topic on #{' #'.join(tweet_hashtags)} - what do you think?",
+        "text": text,
         "user": {
             "id": random.randint(1000, 9999),
             "screen_name": f"user_{random.randint(1000, 9999)}",

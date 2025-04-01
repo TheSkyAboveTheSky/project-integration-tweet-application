@@ -39,10 +39,22 @@ def analyze_sentiment(tweet):
             polarity = blob.sentiment.polarity
             subjectivity = blob.sentiment.subjectivity
         else:
-            # Simplified sentiment using keyword approach
+            # Enhanced simplified sentiment using keyword approach
             text = tweet['text'].lower()
-            positive_words = ['good', 'great', 'awesome', 'excellent', 'happy', 'love', 'amazing']
-            negative_words = ['bad', 'terrible', 'awful', 'sad', 'hate', 'disappointing', 'poor']
+            
+            # Enhanced positive word list
+            positive_words = [
+                'good', 'great', 'awesome', 'excellent', 'happy', 'love', 'amazing',
+                'excited', 'impressive', 'fantastic', 'wonderful', 'enjoying', 'enjoy',
+                'looking forward', 'best', 'brilliant', 'impressed'
+            ]
+            
+            # Enhanced negative word list
+            negative_words = [
+                'bad', 'terrible', 'awful', 'sad', 'hate', 'disappointing', 'poor',
+                'disappointed', 'frustrated', 'not impressed', 'issues', 'problems',
+                'avoid', 'failed', 'struggling', 'worst', 'horrible', 'annoying', 'fail'
+            ]
             
             # Count positive and negative words
             pos_count = sum(1 for word in positive_words if word in text)
@@ -53,10 +65,10 @@ def analyze_sentiment(tweet):
             polarity = 0.0 if total == 0 else (pos_count - neg_count) / total
             subjectivity = 0.5 if total == 0 else min(1.0, total / 10)
         
-        # Assign sentiment label based on polarity
-        if polarity > 0.1:
+        # Adjust sentiment thresholds for more balanced distribution
+        if polarity > 0.05:
             sentiment_label = 'positive'
-        elif polarity < -0.1:
+        elif polarity < -0.05:
             sentiment_label = 'negative'
         else:
             sentiment_label = 'neutral'
