@@ -73,14 +73,25 @@ def simple_normalize_locations(tweet):
 
 def simple_analyze_sentiment(tweet):
     if 'sentiment' not in tweet and 'text' in tweet:
-        # Very basic sentiment using keywords
+        # Enhanced basic sentiment using keywords
         text = tweet.get('text', '').lower()
-        positive_words = ['good', 'great', 'nice', 'happy', 'love']
-        negative_words = ['bad', 'awful', 'hate', 'sad', 'terrible']
+        
+        # Enhanced positive word list
+        positive_words = [
+            'good', 'great', 'nice', 'happy', 'love', 'excited', 'amazing',
+            'impressive', 'excellent', 'enjoying', 'fantastic', 'brilliant'
+        ]
+        
+        # Enhanced negative word list
+        negative_words = [
+            'bad', 'awful', 'hate', 'sad', 'terrible', 'disappointed',
+            'frustrated', 'issues', 'problems', 'avoid', 'failed', 'struggling'
+        ]
         
         pos_count = sum(1 for word in positive_words if word in text)
         neg_count = sum(1 for word in negative_words if word in text)
         
+        # Logic for determining sentiment
         if pos_count > neg_count:
             sentiment = 'positive'
         elif neg_count > pos_count:
