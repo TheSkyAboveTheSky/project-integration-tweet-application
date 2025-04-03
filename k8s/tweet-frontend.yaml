@@ -52,23 +52,3 @@ spec:
   - port: 80
     targetPort: 5000
   type: ClusterIP
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: tweet-frontend-ingress
-  namespace: tweet-analytics
-  annotations:
-    kubernetes.io/ingress.class: nginx
-spec:
-  rules:
-  - host: tweet-analytics.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: tweet-frontend
-            port:
-              number: 80
